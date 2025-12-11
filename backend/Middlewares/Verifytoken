@@ -1,0 +1,36 @@
+const Vendor = require('../Models/Vendor');
+const jwt = require('jsonwebtoken');
+const dotEnv = require('dotenv');
+
+dotEnv.config();
+const SecretKey = process.env.WHATISYOURNAME;
+
+const verifytoken = async (req, res, next) => {
+    try {
+        const token = req.headers.token;
+        if (!token) {
+            return res.status(401).json({ error: "Token is Required" });
+        }
+
+        const decoded = jwt.verify(token, SecretKey);
+
+        const vendorId = decoded._id; // FIXED
+        if (!vendorId) {
+            return res.status(401).json({ error: "Invalid Token Payload" });
+        }
+
+        const vendor = await Vendor.findById(vendorId);
+        if (!vendor) {
+            return res.status(404).json({ error: "Vendor not found" });
+        }
+
+        req.vendorId = vendor._id;
+        req.vendor = vendor;
+        next();
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({ error: "Invalid Token" });
+    }
+};
+
+module.exports = verifytoken;
