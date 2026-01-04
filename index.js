@@ -6,7 +6,7 @@ const FirmRoutes = require("./Routes/FirmRoutes") ;// ADDED
 
 dotEnv.config();
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 app.use(express.json()); // REQUIRED
 app.use(express.urlencoded({ extended: true }));
